@@ -4,3 +4,4 @@ Projet Scientifique Informatique
 * Hubert Ferrand
 * Clément Doat 
 * Cyrille Balamba
+* Diana ALLAM
