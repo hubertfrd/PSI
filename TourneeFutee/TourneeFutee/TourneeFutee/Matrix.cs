@@ -3,13 +3,16 @@
     public class Matrix
     {
         // TODO : ajouter tous les attributs que vous jugerez pertinents 
-
+        private readonly int nbRows;
+        private readonly int nbColumns;
+        private readonly float defaultValue;
+        private readonly List<List<float>> données;
 
         /* Crée une matrice de dimensions `nbRows` x `nbColums`.
          * Toutes les cases de cette matrice sont remplies avec `defaultValue`.
          * Lève une ArgumentOutOfRangeException si une des dimensions est négative
          */
-        public Matrix(int nbRows = 0, int nbColumns = 0, float defaultValue = 0)
+        public Matrix(int nbRows = 0, int nbColumns = 0, float defaultValue = 0, List<List<float>> données)
         {
             // TODO : implémenter
         }
