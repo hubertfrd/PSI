@@ -12,9 +12,26 @@
          * Toutes les cases de cette matrice sont remplies avec `defaultValue`.
          * Lève une ArgumentOutOfRangeException si une des dimensions est négative
          */
-        public Matrix(int nbRows = 0, int nbColumns = 0, float defaultValue = 0, List<List<float>> données)
+        public Matrix(List<List<float>> données,int nbRows = 0, int nbColumns = 0, float defaultValue = 0)
         {
-            // TODO : implémenter
+            if (nbRows < 0 || nbColumns < 0)
+                Console.WriteLine("Les dimensions ne peuvent pas être négatives.");
+
+            this.nbRows = nbRows;
+            this.nbColumns = nbColumns;
+            this.defaultValue = defaultValue;
+            this.données = new List<List<float>>();
+
+            // Initialisation de la structure de données
+            for (int i = 0; i < nbRows; i++)
+            {
+                List<float> row = new List<float>();
+                for (int j = 0; j < nbColumns; j++)
+                {
+                    row.Add(defaultValue);
+                }
+                données.Add(row);
+            }
         }
 
         // Propriété : valeur par défaut utilisée pour remplir les nouvelles cases
@@ -48,7 +65,19 @@
          */
         public void AddRow(int i)
         {
-            // TODO : implémenter
+            if (i < 0 || i > NbRows)
+                Console.WriteLine(nameof(i), "Indice de ligne hors limites.");
+
+            List<float> newRow = new List<float>();
+            int currentCols = NbColumns;
+
+            for (int j = 0; j < currentCols; j++)
+            {
+                newRow.Add(defaultValue);
+            }
+
+            données.Insert(i, newRow);
+           
         }
 
         /* Insère une colonne à l'indice `j`. Décale les colonnes suivantes vers la droite.
@@ -58,21 +87,36 @@
          */
         public void AddColumn(int j)
         {
-            // TODO : implémenter
+            if (j < 0 || j > NbColumns)
+                Console.WriteLine(nameof(j), "Indice de colonne hors limites.");
+
+            foreach (var row in données)
+            {
+                row.Insert(j, defaultValue);
+            }
         }
 
         // Supprime la ligne à l'indice `i`. Décale les lignes suivantes vers le haut.
         // Lève une ArgumentOutOfRangeException si `i` est en dehors des indices valides
         public void RemoveRow(int i)
         {
-            // TODO : implémenter
+            if (i < 0 || i >= NbRows)
+                Console.WriteLine(nameof(i), "Indice invalide.");
+
+            données.RemoveAt(i);
         }
 
         // Supprime la colonne à l'indice `j`. Décale les colonnes suivantes vers la gauche.
         // Lève une ArgumentOutOfRangeException si `j` est en dehors des indices valides
         public void RemoveColumn(int j)
         {
-            // TODO : implémenter
+            if (j < 0 || j >= NbColumns)
+                Console.WriteLine(nameof(j), "Indice invalide.");
+
+            foreach (var row in données)
+            {
+                row.RemoveAt(j);
+            }
         }
 
         // Renvoie la valeur à la ligne `i` et colonne `j`
