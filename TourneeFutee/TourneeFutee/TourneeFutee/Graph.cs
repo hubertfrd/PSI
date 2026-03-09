@@ -4,6 +4,13 @@
     {
 
         // TODO : ajouter tous les attributs que vous jugerez pertinents 
+        private List<string> vertexNames;
+        private List<float> vertexValues;
+        private List<List<float>> adjacencyMatrix;
+
+        private bool directed;
+        private float noEdgeValue;
+
 
 
         // --- Construction du graphe ---
@@ -12,7 +19,13 @@
         // La valeur `noEdgeValue` est le poids modélisant l'absence d'un arc (0 par défaut)
         public Graph(bool directed, float noEdgeValue = 0)
         {
-            // TODO : implémenter
+
+            this.directed = directed;
+            this.noEdgeValue = noEdgeValue;
+
+            this.vertexNames = new List<string>();
+            this.vertexValues = new List<float>();
+            this.adjacencyMatrix = new List<List<float>>();
         }
 
 
@@ -22,16 +35,16 @@
         // Lecture seule
         public int Order
         {
-            get;    // TODO : implémenter
-                    // pas de set
+            get { return this.vertexNames.Count; }
+            // pas de set
         }
 
         // Propriété : graphe orienté ou non
         // Lecture seule
         public bool Directed
         {
-            get;    // TODO : implémenter
-                    // pas de set
+            get { return this.directed; }   // TODO : implémenter
+                                            // pas de set
         }
 
 
@@ -41,7 +54,24 @@
         // Lève une ArgumentException s'il existe déjà un sommet avec le même nom dans le graphe
         public void AddVertex(string name, float value = 0)
         {
-            // TODO : implémenter
+            if (vertexNames.Contains(name))
+                throw new ArgumentException("Existe deja");
+
+            vertexNames.Add(name);
+            vertexValues.Add(value);
+
+            // Ajouter une colonne dans chaque ligne existante
+            foreach (var row in adjacencyMatrix)
+                row.Add(noEdgeValue);
+
+            // Créer nouvelle ligne
+            List<float> newRow = new List<float>();
+
+
+            for (int i = 0; i < Order; i++)
+                newRow.Add(noEdgeValue);
+
+            adjacencyMatrix.Add(newRow);
         }
 
 
@@ -49,22 +79,31 @@
         // Lève une ArgumentException si le sommet n'a pas été trouvé dans le graphe
         public void RemoveVertex(string name)
         {
-            // TODO : implémenter
+            int index = GetVertexIndex(name);
+
+            vertexNames.RemoveAt(index);
+            vertexValues.RemoveAt(index);
+
+            adjacencyMatrix.RemoveAt(index);//supprimer ligne
+
+            foreach (var row in this.adjacencyMatrix)
+                row.RemoveAt(index); //supprimer colonne
         }
 
         // Renvoie la valeur du sommet de nom `name`
         // Lève une ArgumentException si le sommet n'a pas été trouvé dans le graphe
         public float GetVertexValue(string name)
         {
-            // TODO : implémenter
-            return 0.0f;
+            int index = GetVertexIndex(name);
+            return vertexValues[index];
         }
 
         // Affecte la valeur du sommet de nom `name` à `value`
         // Lève une ArgumentException si le sommet n'a pas été trouvé dans le graphe
         public void SetVertexValue(string name, float value)
         {
-            // TODO : implémenter
+            int index = GetVertexIndex(name);
+            vertexValues[index] = value;
         }
 
 
@@ -73,11 +112,27 @@
         // Lève une ArgumentException si le sommet n'a pas été trouvé dans le graphe
         public List<string> GetNeighbors(string vertexName)
         {
+            int index = GetVertexIndex(vertexName);
             List<string> neighborNames = new List<string>();
 
-            // TODO : implémenter
+            // On parcourt la ligne correspondant au sommet dans la matrice d'adjacence
+            for (int j = 0; j < Order; j++)
+            {
+                // Si le poids est différent de noEdgeValue, il y a un arc vers le sommet j
+                if (adjacencyMatrix[index][j] != noEdgeValue)
+                {
+                    neighborNames.Add(vertexNames[j]);
+                }
+            }
 
             return neighborNames;
+        }
+        private int GetVertexIndex(string name)
+        {
+            int index = vertexNames.IndexOf(name);
+            if (index == -1)
+                throw new ArgumentException($"Le sommet '{name}' n'existe pas.");
+            return index;
         }
 
         // --- Gestion des arcs ---
@@ -90,7 +145,21 @@
          */
         public void AddEdge(string sourceName, string destinationName, float weight = 1)
         {
-            // TODO : implémenter
+            int src = GetVertexIndex(sourceName);
+            int dest = GetVertexIndex(destinationName);
+
+            // Vérifier si l'arc existe déjà
+            if (adjacencyMatrix[src][dest] != noEdgeValue)
+                throw new ArgumentException("Existe deja.");
+
+            // Ajouter l'arc
+            adjacencyMatrix[src][dest] = weight;
+
+            // Si le graphe n'est pas orienté, on ajoute l'arc inverse
+            if (!directed)
+            {
+                adjacencyMatrix[dest][src] = weight;
+            }
         }
 
         /* Supprime l'arc allant du sommet nommé `sourceName` au sommet nommé `destinationName` du graphe
@@ -101,7 +170,20 @@
          */
         public void RemoveEdge(string sourceName, string destinationName)
         {
-            // TODO : implémenter
+            int src = GetVertexIndex(sourceName);
+            int dest = GetVertexIndex(destinationName);
+
+            // Vérifier si l'arc existe
+            if (adjacencyMatrix[src][dest] == noEdgeValue)
+                throw new ArgumentException("N'existe pas.");
+
+            // "Supprimer" en remettant la valeur par défaut
+            adjacencyMatrix[src][dest] = noEdgeValue;
+
+            if (!directed)
+            {
+                adjacencyMatrix[dest][src] = noEdgeValue;
+            }
         }
 
         /* Renvoie le poids de l'arc allant du sommet nommé `sourceName` au sommet nommé `destinationName`
@@ -112,8 +194,13 @@
          */
         public float GetEdgeWeight(string sourceName, string destinationName)
         {
-            // TODO : implémenter
-            return 0.0f;
+            int src = GetVertexIndex(sourceName);
+            int dest = GetVertexIndex(destinationName);
+
+            if (adjacencyMatrix[src][dest] == noEdgeValue)
+                throw new ArgumentException("N'existe pas.");
+
+            return adjacencyMatrix[src][dest];
         }
 
         /* Affecte le poids l'arc allant du sommet nommé `sourceName` au sommet nommé `destinationName` à `weight` 
@@ -122,7 +209,17 @@
          */
         public void SetEdgeWeight(string sourceName, string destinationName, float weight)
         {
-            // TODO : implémenter
+            int src = GetVertexIndex(sourceName);
+            int dest = GetVertexIndex(destinationName);
+
+            // Note : On ne vérifie pas si l'arc existe ici selon l'énoncé, 
+            // on affecte simplement le poids (cela peut créer l'arc s'il n'existait pas)
+            adjacencyMatrix[src][dest] = weight;
+
+            if (!directed)
+            {
+                adjacencyMatrix[dest][src] = weight;
+            }
         }
 
         // TODO : ajouter toutes les méthodes que vous jugerez pertinentes 
