@@ -5,28 +5,28 @@ namespace TourneeFutee
     public class Matrix
     {
         // TODO : ajouter tous les attributs que vous jugerez pertinents 
-    
-        private readonly float valeurpardefaut;
+
+        private readonly float defaultValue;
         private readonly List<List<float>> données;
 
         /* Crée une matrice de dimensions `nbRows` x `nbColums`.
          * Toutes les cases de cette matrice sont remplies avec `defaultValue`.
          * Lève une ArgumentOutOfRangeException si une des dimensions est négative
          */
-        public Matrix(int nblignes = 0, int nbcolonnes = 0, float valeurpardefaut = 0)
+        public Matrix(int nbRows = 0, int nbColumns = 0, float defaultValue = 0)
         {
-            if (nblignes < 0 || nbcolonnes < 0)
+            if (nbRows < 0 || nbColumns < 0)
                 throw new ArgumentOutOfRangeException("Indice invalide.");
-            this.valeurpardefaut = valeurpardefaut;
+            this.defaultValue = defaultValue;
             données = new List<List<float>>();
 
             // Initialisation de la structure de données
-            for (int i = 0; i < nblignes; i++)
+            for (int i = 0; i < nbRows; i++)
             {
                 List<float> ligne = new List<float>();
-                for (int j = 0; j < nbcolonnes; j++)
+                for (int j = 0; j < nbColumns; j++)
                 {
-                    ligne.Add(valeurpardefaut);
+                    ligne.Add(defaultValue);
                 }
                 données.Add(ligne);
             }
@@ -34,21 +34,21 @@ namespace TourneeFutee
 
         // Propriété : valeur par défaut utilisée pour remplir les nouvelles cases
         // Lecture seule
-        public float Valeurpardefaut
+        public float DefaultValue
         {
-            get { return this.valeurpardefaut; }
+            get { return this.defaultValue; }
         }
 
         // Propriété : nombre de lignes
         // Lecture seule
-        public int NbLignes
+        public int NbRows
         {
             get { return données.Count; }
         }
 
         // Propriété : nombre de colonnes
         // Lecture seule
-        public int NbColonnes
+        public int NbColumns
         {
             get
             {
@@ -64,17 +64,17 @@ namespace TourneeFutee
          */
         public void AddRow(int i)
         {
-            if (i < 0 || i > NbLignes )
+            if (i < 0 || i > NbRows)
                 throw new ArgumentOutOfRangeException("Indice invalide.");
 
             List<float> nouvligne = new List<float>();
-            for (int j = 0; j < NbColonnes; j++)
+            for (int j = 0; j < NbColumns; j++)
             {
-                nouvligne.Add(Valeurpardefaut);
+                nouvligne.Add(defaultValue);
             }
 
             données.Insert(i, nouvligne);
-           
+
         }
 
         /* Insère une colonne à l'indice `j`. Décale les colonnes suivantes vers la droite.
@@ -84,11 +84,11 @@ namespace TourneeFutee
          */
         public void AddColumn(int j)
         {
-            if (j < 0 || j > NbColonnes)
+            if (j < 0 || j > NbColumns)
                 throw new ArgumentOutOfRangeException("Indice invalide. ");
             foreach (var ligne in données)
             {
-                ligne.Insert(j, Valeurpardefaut);
+                ligne.Insert(j, defaultValue);
             }
         }
 
@@ -96,7 +96,7 @@ namespace TourneeFutee
         // Lève une ArgumentOutOfRangeException si `i` est en dehors des indices valides
         public void RemoveRow(int i)
         {
-            if (i < 0 || i >= NbLignes)
+            if (i < 0 || i >= NbRows)
                 throw new ArgumentOutOfRangeException("Indice invalide.");
 
             données.RemoveAt(i);
@@ -106,7 +106,7 @@ namespace TourneeFutee
         // Lève une ArgumentOutOfRangeException si `j` est en dehors des indices valides
         public void RemoveColumn(int j)
         {
-            if (j < 0 || j >= NbColonnes)
+            if (j < 0 || j >= NbColumns)
                 throw new ArgumentOutOfRangeException("Indice invalide.");
 
             foreach (var ligne in données)
@@ -120,7 +120,7 @@ namespace TourneeFutee
         public float GetValue(int i, int j)
         {
             // TODO : implémenter
-            if (i < 0 || i >= NbLignes || j < 0 || j >= NbColonnes)
+            if (i < 0 || i >= NbRows || j < 0 || j >= NbColumns)
                 throw new ArgumentOutOfRangeException("Indice invalide.");
             return données[i][j];
         }
@@ -130,19 +130,19 @@ namespace TourneeFutee
         public void SetValue(int i, int j, float v)
         {
             // TODO : implémenter
-            if (i < 0 || i >= NbLignes || j < 0 || j >= NbColonnes)
+            if (i < 0 || i >= NbRows || j < 0 || j >= NbColumns)
                 throw new ArgumentOutOfRangeException("Indice invalide.");
             données[i][j] = v;
         }
-        
+
 
         // Affiche la matrice
         public void Print()
         {
             // TODO : implémenter
-            for (int i = 0; i < NbLignes; i++)
+            for (int i = 0; i < NbRows; i++)
             {
-                for (int j = 0; j < NbColonnes; j++)
+                for (int j = 0; j < NbColumns; j++)
                     Console.Write($"{données[i][j],8}");
                 Console.WriteLine();
             }
