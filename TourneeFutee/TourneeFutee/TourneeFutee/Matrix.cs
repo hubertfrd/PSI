@@ -1,61 +1,60 @@
-﻿namespace TourneeFutee
+﻿using System.Data.Common;
+
+namespace TourneeFutee
 {
     public class Matrix
     {
         // TODO : ajouter tous les attributs que vous jugerez pertinents 
-        private readonly int nbRows;
-        private readonly int nbColumns;
-        private readonly float defaultValue;
+    
+        private readonly float valeurpardefaut;
         private readonly List<List<float>> données;
 
         /* Crée une matrice de dimensions `nbRows` x `nbColums`.
          * Toutes les cases de cette matrice sont remplies avec `defaultValue`.
          * Lève une ArgumentOutOfRangeException si une des dimensions est négative
          */
-        public Matrix(List<List<float>> données,int nbRows = 0, int nbColumns = 0, float defaultValue = 0)
+        public Matrix(int nblignes = 0, int nbcolonnes = 0, float valeurpardefaut = 0)
         {
-            if (nbRows < 0 || nbColumns < 0)
-                Console.WriteLine("Les dimensions ne peuvent pas être négatives.");
-
-            this.nbRows = nbRows;
-            this.nbColumns = nbColumns;
-            this.defaultValue = defaultValue;
-            this.données = new List<List<float>>();
+            if (nblignes < 0 || nbcolonnes < 0)
+                throw new ArgumentOutOfRangeException("Indice invalide.");
+            this.valeurpardefaut = valeurpardefaut;
+            données = new List<List<float>>();
 
             // Initialisation de la structure de données
-            for (int i = 0; i < nbRows; i++)
+            for (int i = 0; i < nblignes; i++)
             {
-                List<float> row = new List<float>();
-                for (int j = 0; j < nbColumns; j++)
+                List<float> ligne = new List<float>();
+                for (int j = 0; j < nbcolonnes; j++)
                 {
-                    row.Add(defaultValue);
+                    ligne.Add(valeurpardefaut);
                 }
-                données.Add(row);
+                données.Add(ligne);
             }
         }
 
         // Propriété : valeur par défaut utilisée pour remplir les nouvelles cases
         // Lecture seule
-        public float DefaultValue
+        public float Valeurpardefaut
         {
-            get; // TODO : implémenter
-                 // pas de set
+            get { return this.valeurpardefaut; }
         }
 
         // Propriété : nombre de lignes
         // Lecture seule
-        public int NbRows
+        public int NbLignes
         {
-            get; // TODO : implémenter
-                 // pas de set
+            get { return données.Count; }
         }
 
         // Propriété : nombre de colonnes
         // Lecture seule
-        public int NbColumns
+        public int NbColonnes
         {
-            get; // TODO : implémenter
-                 // pas de set
+            get
+            {
+                if (données.Count == 0) return 0;
+                return données[0].Count;
+            }
         }
 
         /* Insère une ligne à l'indice `i`. Décale les lignes suivantes vers le bas.
@@ -65,18 +64,16 @@
          */
         public void AddRow(int i)
         {
-            if (i < 0 || i > NbRows)
-                Console.WriteLine(nameof(i), "Indice de ligne hors limites.");
+            if (i < 0 || i > NbLignes )
+                throw new ArgumentOutOfRangeException("Indice invalide.");
 
-            List<float> newRow = new List<float>();
-            int currentCols = NbColumns;
-
-            for (int j = 0; j < currentCols; j++)
+            List<float> nouvligne = new List<float>();
+            for (int j = 0; j < NbColonnes; j++)
             {
-                newRow.Add(defaultValue);
+                nouvligne.Add(Valeurpardefaut);
             }
 
-            données.Insert(i, newRow);
+            données.Insert(i, nouvligne);
            
         }
 
@@ -87,12 +84,11 @@
          */
         public void AddColumn(int j)
         {
-            if (j < 0 || j > NbColumns)
-                Console.WriteLine(nameof(j), "Indice de colonne hors limites.");
-
-            foreach (var row in données)
+            if (j < 0 || j > NbColonnes)
+                throw new ArgumentOutOfRangeException("Indice invalide. ");
+            foreach (var ligne in données)
             {
-                row.Insert(j, defaultValue);
+                ligne.Insert(j, Valeurpardefaut);
             }
         }
 
@@ -100,8 +96,8 @@
         // Lève une ArgumentOutOfRangeException si `i` est en dehors des indices valides
         public void RemoveRow(int i)
         {
-            if (i < 0 || i >= NbRows)
-                Console.WriteLine(nameof(i), "Indice invalide.");
+            if (i < 0 || i >= NbLignes)
+                throw new ArgumentOutOfRangeException("Indice invalide.");
 
             données.RemoveAt(i);
         }
@@ -110,12 +106,12 @@
         // Lève une ArgumentOutOfRangeException si `j` est en dehors des indices valides
         public void RemoveColumn(int j)
         {
-            if (j < 0 || j >= NbColumns)
-                Console.WriteLine(nameof(j), "Indice invalide.");
+            if (j < 0 || j >= NbColonnes)
+                throw new ArgumentOutOfRangeException("Indice invalide.");
 
-            foreach (var row in données)
+            foreach (var ligne in données)
             {
-                row.RemoveAt(j);
+                ligne.RemoveAt(j);
             }
         }
 
@@ -124,7 +120,9 @@
         public float GetValue(int i, int j)
         {
             // TODO : implémenter
-            return 0.0f;
+            if (i < 0 || i >= NbLignes || j < 0 || j >= NbColonnes)
+                throw new ArgumentOutOfRangeException("Indice invalide.");
+            return données[i][j];
         }
 
         // Affecte la valeur à la ligne `i` et colonne `j` à `v`
@@ -132,12 +130,22 @@
         public void SetValue(int i, int j, float v)
         {
             // TODO : implémenter
+            if (i < 0 || i >= NbLignes || j < 0 || j >= NbColonnes)
+                throw new ArgumentOutOfRangeException("Indice invalide.");
+            données[i][j] = v;
         }
+        
 
         // Affiche la matrice
         public void Print()
         {
             // TODO : implémenter
+            for (int i = 0; i < NbLignes; i++)
+            {
+                for (int j = 0; j < NbColonnes; j++)
+                    Console.Write($"{données[i][j],8}");
+                Console.WriteLine();
+            }
         }
 
 
