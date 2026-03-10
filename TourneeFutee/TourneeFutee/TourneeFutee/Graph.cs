@@ -210,16 +210,17 @@
          */
         public void SetEdgeWeight(string sourceName, string destinationName, float weight)
         {
-            int src = GetVertexIndex(sourceName);
-            int dest = GetVertexIndex(destinationName);
+            
+            int destination = GetVertexIndex(destinationName);
+            int IndexSource = GetVertexIndex(sourceName);
 
             // Note : On ne vérifie pas si l'arc existe ici selon l'énoncé, 
             // on affecte simplement le poids (cela peut créer l'arc s'il n'existait pas)
-            adjacencyMatrix[src][dest] = weight;
+            adjacencyMatrix[IndexSource][destination] = weight;
 
             if (!directed)
             {
-                adjacencyMatrix[dest][src] = weight;
+                adjacencyMatrix[destination][IndexSource] = weight;
             }
         }
 
