@@ -15,8 +15,9 @@
 
         // --- Construction du graphe ---
 
-        // Contruit un graphe (`directed`=true => orienté)
-        // La valeur `noEdgeValue` est le poids modélisant l'absence d'un arc (0 par défaut)
+        // Contruction d'un graphe 
+        //Indique si le graphe est orienté (true) ou non (false)
+        // La valeur `noEdgeValue` est loids qui modélise l'absence d'un arc (0 par défaut)
         public Graph(bool directed, float noEdgeValue = 0)
         {
 
@@ -31,7 +32,7 @@
 
         // --- Propriétés ---
 
-        // Propriété : ordre du graphe
+        // Propriété : on obtient l'ordre du graphe
         // Lecture seule
         public int Order
         {
@@ -39,7 +40,7 @@
             // pas de set
         }
 
-        // Propriété : graphe orienté ou non
+        // Propriété : Nous indique si un graphe est orienté ou non
         // Lecture seule
         public bool Directed
         {
@@ -51,7 +52,7 @@
         // --- Gestion des sommets ---
 
         // Ajoute le sommet de nom `name` et de valeur `value` (0 par défaut) dans le graphe
-        // Lève une ArgumentException s'il existe déjà un sommet avec le même nom dans le graphe
+        // Une exception est relevée si   existe déjà un sommet avec le même nom dans le graphe
         public void AddVertex(string name, float value = 0)
         {
             if (vertexNames.Contains(name))
@@ -60,7 +61,7 @@
             vertexNames.Add(name);
             vertexValues.Add(value);
 
-            // Ajouter une colonne dans chaque ligne existante
+            // Permet d'ajouter une colonne dans chaque ligne existante
             foreach (var row in adjacencyMatrix)
                 row.Add(noEdgeValue);
 
@@ -75,8 +76,8 @@
         }
 
 
-        // Supprime le sommet de nom `name` du graphe (et tous les arcs associés)
-        // Lève une ArgumentException si le sommet n'a pas été trouvé dans le graphe
+        // Supprime un sommet du graphe et tous les arcs qui y lui sont associés.
+        // Si le sommet n'a pas été trouvé dans le graphe alors une exception est levée
         public void RemoveVertex(string name)
         {
             int index = GetVertexIndex(name);
