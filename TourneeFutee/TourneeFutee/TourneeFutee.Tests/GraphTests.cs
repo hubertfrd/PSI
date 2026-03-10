@@ -236,7 +236,7 @@
             List<string> aNeighbors = g.GetNeighbors("A");
             Assert.IsFalse(aNeighbors.Contains("B"), "B n'est pas dans le voisinage de A");
 
-            // Si le graphe n'est pas orienté, vérifie que B n'a aucun arc ni voisin
+          
             if (!directed)
             {
                 Assert.ThrowsException<ArgumentException>(() =>
