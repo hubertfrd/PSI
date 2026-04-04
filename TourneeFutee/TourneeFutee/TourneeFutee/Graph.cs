@@ -77,7 +77,7 @@
 
 
         // Supprime un sommet du graphe et tous les arcs qui y lui sont associés.
-        // Si le sommet n'a pas été trouvé dans le graphe alors une exception est levée
+        
         public void RemoveVertex(string name)
         {
             int index = GetVertexIndex(name);
@@ -92,7 +92,7 @@
         }
 
         // Renvoie la valeur du sommet de nom `name`
-        // Lève une ArgumentException si le sommet n'a pas été trouvé dans le graphe
+        
         public float GetVertexValue(string name)
         {
             int index = GetVertexIndex(name);
@@ -100,7 +100,7 @@
         }
 
         // Affecte la valeur du sommet de nom `name` à `value`
-        // Lève une ArgumentException si le sommet n'a pas été trouvé dans le graphe
+        
         public void SetVertexValue(string name, float value)
         {
             int index = GetVertexIndex(name);
@@ -110,7 +110,7 @@
 
         // Renvoie la liste des noms des voisins du sommet de nom `vertexName`
         // (si ce sommet n'a pas de voisins, la liste sera vide)
-        // Lève une ArgumentException si le sommet n'a pas été trouvé dans le graphe
+        
         public List<string> GetNeighbors(string vertexName)
         {
             int index = GetVertexIndex(vertexName);
@@ -206,7 +206,6 @@
 
         /* Affecte le poids l'arc allant du sommet nommé `sourceName` au sommet nommé `destinationName` à `weight` 
          * Si le graphe n'est pas orienté, affecte le même poids à l'arc inverse
-         * Lève une ArgumentException si un des sommets n'a pas été trouvé dans le graphe (source et/ou destination)
          */
         public void SetEdgeWeight(string sourceName, string destinationName, float weight)
         {
