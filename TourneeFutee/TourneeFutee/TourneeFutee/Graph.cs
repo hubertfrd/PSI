@@ -223,9 +223,18 @@
             }
         }
 
-        // TODO : ajouter toutes les méthodes que vous jugerez pertinentes 
+        // Ajout pour l'algorithme de Little
+        public List<string> GetVertexNames()
+        {
+            return new List<string>(this.vertexNames);
+        }
+
+
+
 
     }
+
+
 
 
 }
