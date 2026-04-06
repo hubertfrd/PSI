@@ -21,8 +21,94 @@
         // (c'est à dire le cycle hamiltonien de plus faible coût)
         public Tour ComputeOptimalTour()
         {
-            // TODO : implémenter
-            return new Tour();
+            List<string> names = graph.GetVertexNames();
+            int n = names.Count;
+            Matrix m = new Matrix(n, n, float.PositiveInfinity);
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (i == j) continue;
+                    try { m.SetValue(i, j, graph.GetEdgeWeight(names[i], names[j])); }
+                    catch { /* L'arc n'existe pas, reste à l'infini */ }
+                }
+            }
+            float initialBound = ReduceMatrix(m);
+            this.bestCost = float.PositiveInfinity;
+            this.bestsegments = new List<(string, string)>();
+
+            Resoudre(m, initialBound, new List<(string, string)>(), names);
+
+            return new Tour(this.bestsegments, this.bestCost);
+        }
+
+        private void Resoudre(Matrix m, float currentLowerBound, List<(string, string)> included, List<string> names)
+        {
+ 
+            if (currentLowerBound >= this.bestCost) return;
+            if (included.Count == names.Count)
+            {
+                this.bestCost = currentLowerBound;
+                this.bestsegments = new List<(string, string)>(included);
+                return;
+            }
+
+          
+            var pivot = GetMaxRegret(m);
+            if (pivot.i == -1) return;
+
+            string u = names[pivot.i], v = names[pivot.j];
+
+            Matrix mInc = new Matrix(m.NbRows, m.NbColumns, float.PositiveInfinity);
+            for (int r = 0; r < m.NbRows; r++)
+            {
+                for (int c = 0; c < m.NbColumns; c++)
+                {
+                  
+                    mInc.SetValue(r, c, (r == pivot.i || c == pivot.j) ? float.PositiveInfinity : m.GetValue(r, c));
+                }
+            }
+
+            if (pivot.j < mInc.NbRows && pivot.i < mInc.NbColumns)
+            {
+                mInc.SetValue(pivot.j, pivot.i, float.PositiveInfinity);
+            }
+
+            for (int r = 0; r < mInc.NbRows; r++)
+            {
+                for (int c = 0; c < mInc.NbColumns; c++)
+                {
+                    if (mInc.GetValue(r, c) != float.PositiveInfinity &&
+                        IsForbiddenSegment((names[r], names[c]), new List<(string, string)>(included) { (u, v) }, names.Count))
+                    {
+                        mInc.SetValue(r, c, float.PositiveInfinity);
+                    }
+                }
+            }
+
+            float bInc = currentLowerBound + ReduceMatrix(mInc);
+     
+            Matrix mExc = new Matrix(m.NbRows, m.NbColumns, float.PositiveInfinity);
+            for (int r = 0; r < m.NbRows; r++)
+            {
+                for (int c = 0; c < m.NbColumns; c++)
+                {
+                
+                    mExc.SetValue(r, c, (r == pivot.i && c == pivot.j) ? float.PositiveInfinity : m.GetValue(r, c));
+                }
+            }
+
+            float bExc = currentLowerBound + ReduceMatrix(mExc);
+            if (bInc < bExc)
+            {
+                Resoudre(mInc, bInc, new List<(string, string)>(included) { (u, v) }, names);
+                Resoudre(mExc, bExc, included, names);
+            }
+            else
+            {
+                Resoudre(mExc, bExc, included, names);
+                Resoudre(mInc, bInc, new List<(string, string)>(included) { (u, v) }, names);
+            }
         }
 
         // --- Méthodes utilitaires réalisant des étapes de l'algorithme de Little
@@ -82,7 +168,7 @@
         public static bool IsForbiddenSegment((string source, string destination) segment, List<(string source, string destination)> includedSegments, int nbCities)
         {
 
-            // TODO : implémenter
+            
             return false;   
         }
 
