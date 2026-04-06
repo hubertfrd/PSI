@@ -4,12 +4,17 @@
     // en utilisant l'algorithme de Little
     public class Little
     {
-        // TODO : ajouter tous les attributs que vous jugerez pertinents 
+        private Graph grapheActuel;
+
+        // Attributs pour garder en mémoire la meilleure tournée trouvée lors de la récursion
+        private float meilleurCout;
+        private List<(string, string)> trajetsOptimaux;
 
         // Instancie le planificateur en spécifiant le graphe modélisant un problème de voyageur de commerce
         public Little(Graph graph)
         {
-            // TODO : implémenter
+            // On stocke le graphe passé en paramètre dans notre attribut
+            this.grapheActuel = graph;
         }
 
         // Trouve la tournée optimale dans le graphe `this.graph`
