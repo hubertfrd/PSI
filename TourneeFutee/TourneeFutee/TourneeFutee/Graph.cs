@@ -58,9 +58,11 @@
             if (vertexNames.Contains(name))
                 throw new ArgumentException("Existe deja");
 
-            int newIndex = vertexNames.Count - 1;
+            int newIndex = vertexNames.Count;
             adjacencyMatrix.AddRow(newIndex);
             adjacencyMatrix.AddColumn(newIndex);
+            vertexNames.Add(name);
+            vertexValues.Add(value);
         }
 
 

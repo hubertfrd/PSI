@@ -29,8 +29,11 @@
                 for (int j = 0; j < n; j++)
                 {
                     if (i == j) continue;
-                    try { m.SetValue(i, j, graph.GetEdgeWeight(names[i], names[j])); }
-                    catch { /* L'arc n'existe pas, reste à l'infini */ }
+                    List<string> neighbors = graph.GetNeighbors(names[i]);
+                    if (neighbors.Contains(names[j]))
+                    {
+                        m.SetValue(i, j, graph.GetEdgeWeight(names[i], names[j]));
+                    }
                 }
             }
             float initialBound = ReduceMatrix(m);
