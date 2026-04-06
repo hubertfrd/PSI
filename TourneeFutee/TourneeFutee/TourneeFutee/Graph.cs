@@ -228,10 +228,6 @@
         {
             return new List<string>(this.vertexNames);
         }
-
-
-
-
     }
 
 
