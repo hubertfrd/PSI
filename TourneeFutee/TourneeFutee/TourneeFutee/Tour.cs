@@ -22,6 +22,10 @@
             this.cost = cost;
         }
 
+
+
+
+
         // propriétés
         // Coût total de la tournée
         public float Cost
@@ -61,7 +65,46 @@
             }
         }
 
-        
+
+
+
+        //Nouveau constructeur attendu par les tests
+        // Construit une tournée à partir d'une séquence de sommets (ex: "A", "C", "F"...)
+        public Tour(List<string> sequence, float cost)
+        {
+            this.segments = new List<(string, string)>();
+
+            // Transforme la séquence de sommets consécutifs en segments (A->C, C->F, etc.)
+            for (int i = 0; i < sequence.Count - 1; i++)
+            {
+                this.segments.Add((sequence[i], sequence[i + 1]));
+            }
+
+            this.cost = cost;
+        }
+
+        // Propriété attendue par les tests
+        // Reconstruit et renvoie la séquence ordonnée des sommets visités
+        public List<string> Vertices
+        {
+            get
+            {
+                var list = new List<string>();
+                if (this.segments.Count == 0)
+                    return list;
+
+                // Ajoute la source du tout premier segment
+                list.Add(this.segments[0].source);
+
+                // Ajoute les destinations de tous les segments
+                foreach (var segment in this.segments)
+                {
+                    list.Add(segment.destination);
+                }
+                return list;
+            }
+        }
+
 
     }
 }

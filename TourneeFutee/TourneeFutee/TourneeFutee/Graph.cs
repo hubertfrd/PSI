@@ -220,6 +220,16 @@
         {
             return new List<string>(this.vertexNames);
         }
+
+
+
+        // Vérifie si un sommet existe dans le graphe
+        public bool ContainsVertex(string name)
+        {
+            return this.vertexNames.Contains(name);
+        }
+
+
     }
 
 
