@@ -36,13 +36,23 @@ namespace TourneeFutee
         /// <exception cref="Exception">Levée si la connexion échoue.</exception>
         public ServicePersistance(string serverIp, string dbname, string user, string pwd)
         {
-          // TODO : initialiser et ouvrir la connexion à la base de données
-        // Exemple :
+            // 1. Définition de la chaîne de connexion
             _connectionString = $"server={serverIp};database={dbname};uid={user};pwd={pwd};";
 
-            // TODO : tester la connexion dès la construction
-            //        (ouvrir puis fermer une connexion pour valider les paramètres)
-            throw new NotImplementedException("Constructeur non implémenté.");
+            // 2. Test de la connexion dès la construction
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(_connectionString))
+                {
+                    conn.Open();
+                    // Si on arrive ici, les identifiants sont bons et on peut accéder à la BDD
+                }
+            }
+            catch (MySqlException ex)
+            {
+                // On capture l'erreur pour remonter un message clair
+                throw new Exception($"Impossible de se connecter à la base de données '{dbname}'. Détail de l'erreur : {ex.Message}", ex);
+            }
         }
 
         // ─────────────────────────────────────────────────────────────────────
