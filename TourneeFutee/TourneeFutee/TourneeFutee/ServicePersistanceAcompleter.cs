@@ -1,4 +1,5 @@
 using System;
+using System.Reflection.PortableExecutable;
 using MySql.Data.MySqlClient;
 
 namespace TourneeFutee
@@ -51,7 +52,7 @@ namespace TourneeFutee
             catch (MySqlException ex)
             {
                 // On capture l'erreur pour remonter un message clair
-                throw new Exception($"Impossible de se connecter à la base de données '{dbname}'. Détail de l'erreur : {ex.Message}", ex);
+                throw new Exception("Erreur de connexion : " + ex.Message);
             }
         }
 
@@ -78,6 +79,65 @@ namespace TourneeFutee
             //
             // Exemple pour récupérer l'id généré :
             //   uint id = Convert.ToUInt32(cmd.ExecuteScalar());
+            using (MySqlConnection conn = OpenConnection())
+            {
+                using (MySqlTransaction trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        // Insertion du Graphe
+                        string sqlGraph = "INSERT INTO Graphe (est_oriente) VALUES (@directed); SELECT LAST_INSERT_ID();";
+                        MySqlCommand cmdGraph = new MySqlCommand(sqlGraph, conn, trans);
+                        cmdGraph.Parameters.AddWithValue("@directed", g.Directed);
+                        uint graphId = Convert.ToUInt32(cmdGraph.ExecuteScalar());
+
+                        // Insertion des Sommets et mise en mémoire de leurs IDs SQL
+                        var vertexNames = g.GetVertexNames();
+                        Dictionary<string, uint> vertexIdMap = new Dictionary<string, uint>();
+
+                        foreach (string name in vertexNames)
+                        {
+                            string sqlVertex = "INSERT INTO Sommet (nom, valeur, graphe_id) VALUES (@nom, @val, @gid); SELECT LAST_INSERT_ID();";
+                            MySqlCommand cmdVertex = new MySqlCommand(sqlVertex, conn, trans);
+                            cmdVertex.Parameters.AddWithValue("@nom", name);
+                            cmdVertex.Parameters.AddWithValue("@val", g.GetVertexValue(name));
+                            cmdVertex.Parameters.AddWithValue("@gid", graphId);
+
+                            uint vId = Convert.ToUInt32(cmdVertex.ExecuteScalar());
+                            vertexIdMap.Add(name, vId);
+                        }
+
+                        // Insertion des Arcs
+                        foreach (string source in vertexNames)
+                        {
+                            foreach (string dest in vertexNames)
+                            {
+                                try
+                                {
+                                    float weight = g.GetEdgeWeight(source, dest);
+                                    string sqlArc = "INSERT INTO Arc (sommet_source, sommet_dest, poids, graphe_id) " +
+                                     "VALUES (@src, @dst, @poids, @gid);";
+                                    MySqlCommand cmdArc = new MySqlCommand(sqlArc, conn, trans);
+                                    cmdArc.Parameters.AddWithValue("@src", vertexIdMap[source]);
+                                    cmdArc.Parameters.AddWithValue("@dst", vertexIdMap[dest]);
+                                    cmdArc.Parameters.AddWithValue("@poids", weight);
+                                    cmdArc.Parameters.AddWithValue("@gid", graphId);
+                                    cmdArc.ExecuteNonQuery();
+                                }
+                                catch (ArgumentException) { /* L'arc n'existe pas, on passe au suivant */ }
+                            }
+                        }
+
+                        trans.Commit();
+                        return graphId;
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        throw new Exception("Erreur lors de la sauvegarde du graphe : " + ex.Message);
+                    }
+                }
+            }
 
             throw new NotImplementedException("SaveGraph non implémenté.");
         }
@@ -99,7 +159,7 @@ namespace TourneeFutee
             //       correspondent à ceux sauvegardés)
             //   3. SELECT dans Arc WHERE graphe_id = @id -> reconstruire la matrice
             //      d'adjacence en utilisant les correspondances sommet_id <-> indice
-
+            
             throw new NotImplementedException("LoadGraph non implémenté.");
         }
 
@@ -122,7 +182,7 @@ namespace TourneeFutee
             //
             // Attention : conserver l'ordre des étapes est essentiel pour
             //             pouvoir reconstruire la tournée fidèlement au chargement.
-
+           
             throw new NotImplementedException("SaveTour non implémenté.");
         }
 
@@ -141,6 +201,7 @@ namespace TourneeFutee
             //   2. SELECT dans EtapeTournee JOIN Sommet WHERE tournee_id = @id
             //      ORDER BY numero_ordre -> reconstruire la séquence ordonnée de sommets
             //   3. Construire et retourner l'instance Tour
+           
 
             throw new NotImplementedException("LoadTour non implémenté.");
         }
