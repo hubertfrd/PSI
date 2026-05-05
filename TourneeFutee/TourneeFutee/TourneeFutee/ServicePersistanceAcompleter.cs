@@ -159,7 +159,59 @@ namespace TourneeFutee
             //       correspondent à ceux sauvegardés)
             //   3. SELECT dans Arc WHERE graphe_id = @id -> reconstruire la matrice
             //      d'adjacence en utilisant les correspondances sommet_id <-> indice
-            
+
+            using (MySqlConnection conn = OpenConnection())
+            {
+                //  Récupérer les infos du graphe
+                MySqlCommand cmdG = new MySqlCommand("SELECT est_oriente FROM Graphe WHERE id = @id", conn);
+                cmdG.Parameters.AddWithValue("@id", id);
+                bool isDirected = Convert.ToBoolean(cmdG.ExecuteScalar());
+
+                Graph g = new Graph(isDirected, float.PositiveInfinity);
+
+                //  Charger les sommets
+                MySqlCommand cmdV = new MySqlCommand("SELECT id, nom, valeur FROM Sommet WHERE graphe_id = @id ORDER BY id", conn);
+                cmdV.Parameters.AddWithValue("@id", id);
+
+                Dictionary<uint, string> idToName = new Dictionary<uint, string>();
+                using (var reader = cmdV.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string name = reader.GetString("nom");
+                        float val = reader.GetFloat("valeur");
+                        uint dbId = reader.GetUInt32("id");
+
+                        g.AddVertex(name, val);
+                        idToName.Add(dbId, name);
+                    }
+                }
+
+                //  Charger les arcs
+                MySqlCommand cmdA = new MySqlCommand("SELECT sommet_source, sommet_dest, poids FROM Arc WHERE graphe_id = @id", conn);
+                cmdA.Parameters.AddWithValue("@id", id);
+                using (var reader = cmdA.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string srcName = idToName[reader.GetUInt32("sommet_source")];
+                        string dstName = idToName[reader.GetUInt32("sommet_dest")];
+                        float weight = reader.GetFloat("poids");
+
+                        // ON AJOUTE CETTE SECURITE :
+                        try
+                        {
+                            g.AddEdge(srcName, dstName, weight);
+                        }
+                        catch (ArgumentException)
+                        {
+                            // Si l'arc existe déjà (cas du non-orienté), on ignore l'erreur
+                        }
+                    }
+                }
+                return g;
+            }
+
             throw new NotImplementedException("LoadGraph non implémenté.");
         }
 
