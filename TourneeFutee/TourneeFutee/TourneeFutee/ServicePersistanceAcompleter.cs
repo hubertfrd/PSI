@@ -291,8 +291,33 @@ namespace TourneeFutee
             //   2. SELECT dans EtapeTournee JOIN Sommet WHERE tournee_id = @id
             //      ORDER BY numero_ordre -> reconstruire la séquence ordonnée de sommets
             //   3. Construire et retourner l'instance Tour
-           
+            using (MySqlConnection conn = OpenConnection())
+            {
+                //  Récupérer le coût
+                MySqlCommand cmd = new MySqlCommand("SELECT cout_total FROM Tournee WHERE id = @id", conn);
+                cmd.Parameters.AddWithValue("@id", id);
+                float cost = Convert.ToSingle(cmd.ExecuteScalar());
 
+                // Récupérer la séquence de sommets (via JOIN pour avoir les noms directement)
+                string sql = @"SELECT s.nom FROM EtapeTournee et 
+            JOIN Sommet s ON et.sommet_id = s.id 
+            WHERE et.tournee_id = @id 
+            ORDER BY et.numero_ordre";
+
+                MySqlCommand cmdS = new MySqlCommand(sql, conn);
+                cmdS.Parameters.AddWithValue("@id", id);
+
+                List<string> sequence = new List<string>();
+                using (var reader = cmdS.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        sequence.Add(reader.GetString("nom"));
+                    }
+                }
+
+                return new Tour(sequence, cost);
+            }
             throw new NotImplementedException("LoadTour non implémenté.");
         }
 
