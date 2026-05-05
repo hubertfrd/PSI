@@ -234,7 +234,45 @@ namespace TourneeFutee
             //
             // Attention : conserver l'ordre des étapes est essentiel pour
             //             pouvoir reconstruire la tournée fidèlement au chargement.
-           
+            using (MySqlConnection conn = OpenConnection())
+            {
+                using (MySqlTransaction trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        // Insertion dans Tournee
+                        MySqlCommand cmdT = new MySqlCommand("INSERT INTO Tournee (cout_total, graphe_id) VALUES (@cout, @gid); SELECT LAST_INSERT_ID();", conn, trans);
+                        cmdT.Parameters.AddWithValue("@cout", t.Cost);
+                        cmdT.Parameters.AddWithValue("@gid", graphId);
+                        uint tourId = Convert.ToUInt32(cmdT.ExecuteScalar());
+
+                        //  Insertion des étapes
+                        var vertices = t.Vertices;
+                        for (int i = 0; i < vertices.Count; i++)
+                        {
+                            // On récupère l'ID du sommet en BDD pour ce nom et ce graphe
+                            MySqlCommand cmdGetV = new MySqlCommand("SELECT id FROM Sommet WHERE nom = @nom AND graphe_id = @gid", conn, trans);
+                            cmdGetV.Parameters.AddWithValue("@nom", vertices[i]);
+                            cmdGetV.Parameters.AddWithValue("@gid", graphId);
+                            uint sId = Convert.ToUInt32(cmdGetV.ExecuteScalar());
+
+                            MySqlCommand cmdE = new MySqlCommand("INSERT INTO EtapeTournee (tournee_id, numero_ordre, sommet_id) VALUES (@tid, @pos, @sid)", conn, trans);
+                            cmdE.Parameters.AddWithValue("@tid", tourId);
+                            cmdE.Parameters.AddWithValue("@pos", i);
+                            cmdE.Parameters.AddWithValue("@sid", sId);
+                            cmdE.ExecuteNonQuery();
+                        }
+
+                        trans.Commit();
+                        return tourId;
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        throw new Exception("Erreur sauvegarde tournée : " + ex.Message);
+                    }
+                }
+            }
             throw new NotImplementedException("SaveTour non implémenté.");
         }
 
