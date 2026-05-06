@@ -6,8 +6,8 @@
         {
             string serverIp = "127.0.0.1"; 
             string dbname = "tourneefutee_test";
-            string user = "root"; // L'utilisateur par défaut sous WAMP/XAMPP
-            string pwd = "Clement2006!";      // Souvent vide sous WAMP/XAMPP, ou "root" sous MAMP
+            string user = "psi"; // L'utilisateur par défaut sous WAMP/XAMPP
+            string pwd = "PSI";      // Souvent vide sous WAMP/XAMPP, ou "root" sous MAMP
 
             try
             {
